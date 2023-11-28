@@ -14,7 +14,8 @@ struct Product {
     int price;
 };
 
-void displayMenu() {
+void displayMenuWithTime() {
+    displayCurrentTime();
     printf("<== Select features: ==>\n");
     printf("1. Display Products\n");
     printf("2. Update product\n");
