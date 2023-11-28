@@ -1,4 +1,4 @@
 @echo off
-gcc Daily.c -o Daily.exe
+REM คำสั่งเพื่อคอมไพล์และรันโปรแกรม C
+gcc -o Daily Daily.c
 Daily.exe
-pause
