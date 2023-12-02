@@ -24,7 +24,7 @@ void displayMenu() {
     printf("1. Display Products\n");
     printf("2. Update product\n");
     printf("3. Edit the transaction\n");
-    printf("5. End of the Day\n");
+    printf("4. End of the Day\n");
     printf("0. Close Program\n");
 }
 
@@ -103,10 +103,20 @@ void Display(struct Product *products, int *row) {
         sum[i].price=0;
         sum[i].quantity=0.0;
     }
+
+    struct Product sum2[cnt];
+
+    for(int i=0;i<cnt;i++ ) {
+        sum2[i].price=0;
+        sum2[i].quantity=0.0;
+    }
+
     // Copy strings from strings to sum
     for (int i = 0; i < cnt; i++) {
         strcpy(sum[i].productID, strings[i]);
         strcpy(sum[i].name,name[i]);
+        strcpy(sum2[i].productID, strings[i]);
+        strcpy(sum2[i].name,name[i]);
     }
 
     displaySummary();
@@ -132,8 +142,27 @@ void Display(struct Product *products, int *row) {
             printf("%-12s\t%-12s\t%.2lf\t%d\n",sum[i].productID,sum[i].name,sum[i].quantity,sum[i].price);
         }
     }
+
     else if(want == 2) {
-        printf("2");
+        int moneynow = 0;
+        for(int i=0;i<cnt;i++) {
+            for(int j=0;j<*row;j++) {
+                if(strcmp(sum[i].productID,products[j].productID) == 0) {
+                    if(strcmp(products[j].inout, "Out") == 0) {
+                        sum2[i].price += products[j].price;
+                        sum2[i].quantity += products[j].quantity;
+                    }
+                }
+            }
+        }
+        printf("Product ID\tName\t       Amount\tPrice\n");
+        for(int i=0;i<cnt;i++) {
+            printf("%-12s\t%-12s\t%.2lf\t%d\n",sum2[i].productID,sum2[i].name,sum2[i].quantity,sum2[i].price);
+        }
+        for(int i=0;i<cnt;i++) {
+            moneynow+=sum2[i].price;
+        }
+        printf("Now, the income is %d baht\n",moneynow);
     }
     // Free allocated memory
     for (int i = 0; i < MAX_Product_ID; i++) {
@@ -202,7 +231,8 @@ int main() {
     if(select == 2) {
         appendpro(products);
     }
-    if(select == 1) {
+    else if(select == 1) {
+        system("clear");
         Display(products,&row);
     }
     return 0;
