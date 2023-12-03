@@ -222,23 +222,93 @@ void appendpro(struct Product *products) {
     fclose(file);
 }
 
-void EditTransaction(struct Product *products, int row) {
-    char dateToEdit[MAX_LINE_LENGTH];
-    printf("Enter the date (DD/MM/YYYY) of the transactions to display: ");
-    scanf("%s", dateToEdit);
 
-    printf("Transactions on %s:\n", dateToEdit);
-    int found = 0;
-    for (int i = 0; i < row; i++) {
-        if (strcmp(products[i].date, dateToEdit) == 0) {
-            found = 1;
-            printf("Product ID: %s, Name: %s\n", products[i].productID, products[i].name);
-            printf("Quantity: %.2lf, Price: %d\n", products[i].quantity, products[i].price);
-        }
+void updateCSV(struct Product *products, int row) {
+    FILE *file = fopen("Ice_Cream_Shop.csv", "w");
+    if (file == NULL) {
+        printf("Error opening file!\n");
+        return;
     }
 
-    if (!found) {
-        printf("No transactions found for %s\n", dateToEdit);
+   
+    fprintf(file, "In/Out,Date,Expired Date,Time,Product ID,Name,Amount,Price\n");
+
+    
+    for (int i = 0; i < row; i++) {
+        fprintf(file, "%s,%s,%s,%.2lf,%s,%s,%.2lf,%d\n", products[i].inout, products[i].date, products[i].expireD, products[i].time, products[i].productID, products[i].name, products[i].quantity, products[i].price);
+    }
+
+    fclose(file);
+}
+
+
+void editTransaction(struct Product *products, int row) {
+    int selection;
+
+    printf("Products List:\n");
+    printf("No.  In/Out  Date       Expired Date  Time  Product ID  Name         Amount  Price\n");
+    for (int i = 0; i < row; i++) {
+        printf("%-5d %-7s %-10s %-12s %.2lf %-11s %-12s %-7.2lf %d\n", i + 1, products[i].inout, products[i].date, products[i].expireD, products[i].time, products[i].productID, products[i].name, products[i].quantity, products[i].price);
+    }
+
+    printf("Select the item number to edit or delete: ");
+    scanf("%d", &selection);
+    selection--; 
+    if (selection < 0 || selection >= row) {
+        printf("Invalid selection.\n");
+        return;
+    }
+
+    printf("\033[1;34mDo you want to edit or delete this item?\033[0m\n");
+    printf("\033[1;33m1. EDIT\033[0m\n");
+    printf("\033[1;31m2. DELETE\033[0m\n");
+
+    int action;
+    printf("Enter your choice: ");
+    scanf("%d", &action);
+
+    switch (action) {
+        case 1:
+            
+            printf("Enter new quantity: ");
+            scanf("%lf", &products[selection].quantity);
+            printf("Enter new price: ");
+            scanf("%d", &products[selection].price);
+
+            printf("Updated transaction:\n");
+            printf("In/Out  Date       Expired Date  Time  Product ID  Name         Amount  Price\n");
+            printf("%-7s %-10s %-12s %.2lf %-11s %-12s %-7.2lf %d\n", products[selection].inout, products[selection].date, products[selection].expireD, products[selection].time, products[selection].productID, products[selection].name, products[selection].quantity, products[selection].price);
+
+            char confirm;
+            printf("Confirm changes? (Y/N): ");
+            scanf(" %c", &confirm);
+
+            if (confirm == 'Y' || confirm == 'y') {
+                updateCSV(products, row);
+            } else {
+                printf("Changes discarded.\n");
+            }
+            break;
+        case 2:
+            
+            for (int i = selection; i < row - 1; ++i) {
+                products[i] = products[i + 1];
+            }
+            row--;
+
+            char confirmDelete;
+            printf("\033[1;31mConfirm deletion? (Y/N): \033[0m");
+            scanf(" %c", &confirmDelete);
+
+            if (confirmDelete == 'Y' || confirmDelete == 'y') {
+                updateCSV(products, row);
+            } else {
+                printf("Deletion discarded.\n");
+            }
+            break;
+        default:
+            printf("\033[1;31mInvalid choice.\033[0m\n");
+            break;
     }
 }
 
@@ -257,7 +327,9 @@ int main() {
         Display(products,&row);
     }else if(select == 3) {
         system("clear || cls");
-        EditTransaction(products, row);
+        editTransaction(products, row);
+        system("clear || cls");
+        main();
     }
     return 0;
 }
