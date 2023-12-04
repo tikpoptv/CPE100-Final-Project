@@ -1,0 +1,36 @@
+
+
+void DisplayNearExpiration(struct Product *products, int *row) {
+    printf("Items Near Expiration (within 30 days):\n");
+    printf("Product ID\tName\t       Expired Date\n");
+
+    // Get the current time
+    time_t currentTime;
+    time(&currentTime);
+
+    // Assuming the date format is DD/MM/YYYY
+    struct tm expirationDate;
+
+    for (int i = 0; i < *row; i++) {
+        if (strcmp(products[i].expireD, "null") != 0) {
+            // Convert the string expiration date to a tm struct
+            strptime(products[i].expireD, "%d/%m/%Y", &expirationDate);
+
+            // Convert tm struct to time_t
+            time_t expirationTime = mktime(&expirationDate);
+
+            // Calculate the difference in days
+            double difference = difftime(expirationTime, currentTime) / (60 * 60 * 24);
+
+            // Check if the item is within 30 days of expiration
+            if (difference < 30) {
+                printf("%-12s\t%-12s\t%s\n", products[i].productID, products[i].name, products[i].expireD);
+            }
+        }
+    }
+}
+
+
+int main(){
+  DisplayNearExpiration(products, &row); 
+}
