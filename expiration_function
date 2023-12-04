@@ -1,4 +1,4 @@
-
+#include <time.h>
 
 void DisplayNearExpiration(struct Product *products, int *row) {
     printf("Items Near Expiration (within 30 days):\n");
