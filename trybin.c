@@ -25,6 +25,7 @@ void displayMenu() {
     printf("1. Display Products\n");
     printf("2. Update product\n");
     printf("3. Edit the transaction\n");
+    printf("4. Display All Products\n");
     printf("0. Close Program\n");
 }
 
@@ -76,6 +77,18 @@ void readFromBinaryFile(struct Product *products, int *count, const char *filena
     *count = fread(products, sizeof(struct Product), *count, file);
 
     fclose(file);
+}
+
+void displayAll(struct Product *products, int *row) {
+    printf("Displaying all products:\n");
+    printf("No. In/Out Date       Expired Date Time Product ID Name         Amount Price\n");
+
+    for (int i = 0; i < *row; i++) {
+        printf("%-4d %-6s %-10s %-12s %.2lf %-11s %-12s %-6.2lf %d\n", 
+            i + 1, products[i].inout, products[i].date, products[i].expireD, 
+            products[i].time, products[i].productID, products[i].name, 
+            products[i].quantity, products[i].price);
+    }
 }
 
 
@@ -533,11 +546,14 @@ void DisplayNearExpiration(struct Product *products, int *row) {
             // Convert tm struct to time_t
             time_t expirationTime = mktime(&expirationDate);
 
+            // Calculate the difference in seconds
+            double difference = difftime(expirationTime, currentTime);
+
             // Calculate the difference in days
-            double difference = difftime(expirationTime, currentTime) / (60 * 60 * 24);
-            printf("In condition\n");
+            double differenceInDays = difference / (60 * 60 * 24);
+
             // Check if the item is within 30 days of expiration
-            if (difference < 30) {
+            if (differenceInDays < 30) {
                 printf("%-12s\t%-12s\t%s\n", products[i].productID, products[i].name, products[i].expireD);
             }
         }
@@ -545,15 +561,18 @@ void DisplayNearExpiration(struct Product *products, int *row) {
 }
 
 
+
 int main() {
     int row=0,select;
     char date[20];
     struct Product products[MAX_PRODUCTS];
-    displayMenu();
-    scanf("%d",&select);
     size_t recordsize = sizeof(struct Product);
     row = findNumberOfRecords("IceCreambin.dat",recordsize);
     readFromBinaryFile(products,&row,"IceCreambin.dat");
+    system("clear|| cls");
+    DisplayNearExpiration(products,&row);
+    displayMenu();
+    scanf("%d",&select);
     if(select == 2) {
         appendpro(products,date);
         main();
@@ -573,6 +592,10 @@ int main() {
     else if(select == 0) {
         system("clear || cls");
         printf("Closed the Program\n");
+    }
+    else if(select == 4) {
+        printf("Selected option 4. Displaying all products...\n");
+        displayAll(products, &row);
     }
     return 0;
 }
