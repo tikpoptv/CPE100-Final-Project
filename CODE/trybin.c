@@ -24,7 +24,7 @@ struct Product {
 
 void openFile(const char *filename) {
     char command[200];
-    sprintf(command, "open \"%s\" || start \"%s\", filename);
+    sprintf(command, "open \"%s\"", filename);
     system(command);
 }
 
@@ -34,35 +34,7 @@ void openFileFinder(const char *filename) {
     system(command);
 }
 
-void displayMenuAndGetChoice(const char *filename) {
-    printf("\033[1;34mDo you want to openFile or openFileFinder this item?\033[0m\n");
-    printf("\033[1;33m1. openFile\033[0m\n");
-    printf("\033[1;33m2. openFileFinder\033[0m\n");
-    printf("\033[1;31m0. Main Menu\033[0m\n");
-
-    int action;
-    printf("Enter your choice: ");
-    scanf("%d", &action);
-
-    system("clear|| cls");
-    switch (action) {
-        case 1:
-            openFile(filename);
-            displayMenuAndGetChoice(filename);
-            break;
-        case 2:
-            openFileFinder(filename);
-            displayMenuAndGetChoice(filename);
-            break;
-        case 0:
-            main();
-            break; 
-        default:
-            printf("\033[1;31mInvalid choice.\033[0m\n");
-            displayMenuAndGetChoice(filename);
-            break;
-    }
-}
+void displayMenuAndGetChoice(const char *filename);
 
 //<-------------------Display funtions------------------------->
 //display when start of the process
@@ -1345,4 +1317,34 @@ int main() {
       //  displayRemainingStock(products, &row);
     }
     return 0;
+}
+
+void displayMenuAndGetChoice(const char *filename) {
+    printf("\033[1;34mDo you want to openFile or openFileFinder this item?\033[0m\n");
+    printf("\033[1;33m1. openFile\033[0m\n");
+    printf("\033[1;33m2. openFileFinder\033[0m\n");
+    printf("\033[1;31m0. Main Menu\033[0m\n");
+
+    int action;
+    printf("Enter your choice: ");
+    scanf("%d", &action);
+
+    system("clear|| cls");
+    switch (action) {
+        case 1:
+            openFile(filename);
+            displayMenuAndGetChoice(filename);
+            break;
+        case 2:
+            openFileFinder(filename);
+            displayMenuAndGetChoice(filename);
+            break;
+        case 0:
+            main();
+            break; 
+        default:
+            printf("\033[1;31mInvalid choice.\033[0m\n");
+            displayMenuAndGetChoice(filename);
+            break;
+    }
 }
