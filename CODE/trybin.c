@@ -1,8 +1,8 @@
-#include<stdio.h>
-#include<string.h>
-#include<stdlib.h>
-#include<time.h>
-#include<stdint.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <time.h>
+#include <stdint.h>
 
 //Define the Worst case scenario number
 #define MAX_LINE_LENGTH 100
@@ -241,7 +241,7 @@ void Display(struct Product *products, int *row) {
 
 //<------------------Update a product in our file-------------------------->
 void appendpro(struct Product *products) {
-    FILE *file = fopen("IceCreambin.dat", "ab");  // Open the binary file for appending in binary mode
+    FILE *file = fopen("../Database/IceCreambin.dat", "ab");  // Open the binary file for appending in binary mode
 
     if (!file) {
         printf("Error opening file for appending\n");
@@ -651,7 +651,7 @@ struct AdminData {
 };
 
 void writeAdminDataToBinaryFile(struct AdminData *adminData) {
-    FILE *file = fopen("AdminDB.dat", "wb");
+    FILE *file = fopen("../Database/AdminDB.dat", "wb");
     if (!file) {
         printf("Error opening file for writing\n");
         return;
@@ -663,7 +663,7 @@ void writeAdminDataToBinaryFile(struct AdminData *adminData) {
 }
 
 void readAdminDataFromBinaryFile(struct AdminData *adminData) {
-    FILE *file = fopen("AdminDB.dat", "rb");
+    FILE *file = fopen("../Database/AdminDB.dat", "rb");
     if (!file) {
         printf("Error opening file for reading\n");
         return;
@@ -691,7 +691,7 @@ void addAdmin() {
     // Copy the hashed password to the admin data
     memcpy(admin.password, hashedPassword, SHA256_DIGEST_LENGTH);
 
-    FILE *file = fopen("AdminDB.dat", "ab");
+    FILE *file = fopen("../Database/AdminDB.dat", "ab");
     if (!file) {
         printf("Error opening file for writing\n");
         return;
@@ -735,7 +735,7 @@ int adminLogin() {
     printf("Enter password: ");
     scanf("%s", password);
 
-    FILE *file = fopen("AdminDB.dat", "rb");
+    FILE *file = fopen("../Database/AdminDB.dat", "rb");
     if (!file) {
         printf("Error opening file for reading\n");
         return 0;
@@ -786,7 +786,7 @@ void updateCSV(struct Product *products, int row) {
 }
 
 void updateBinary(struct Product *products, int row) {
-    FILE *binaryFile = fopen("IceCreambin.dat", "wb");
+    FILE *binaryFile = fopen("../Database/IceCreambin.dat", "wb");
 
     if (binaryFile == NULL) {
         printf("Error opening binary file for writing.\n");
@@ -920,8 +920,8 @@ int main() {
     int row=0,select;
     struct Product products[MAX_PRODUCTS];
     size_t recordsize = sizeof(struct Product);
-    row = findNumberOfRecords("IceCreambin.dat",recordsize);
-    readFromBinaryFile(products,&row,"IceCreambin.dat");
+    row = findNumberOfRecords("../Database/IceCreambin.dat",recordsize);
+    readFromBinaryFile(products,&row,"../Database/IceCreambin.dat");
     system("clear|| cls");
     DisplayNearExpiration(products,&row);
     displayMenu();
