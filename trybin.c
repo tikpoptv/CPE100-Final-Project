@@ -1,7 +1,7 @@
-#include<stdio.h>
-#include<string.h>
+#include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
-#include<time.h>
+#include <time.h>
 
 //Define the Worst case scenario number
 #define MAX_LINE_LENGTH 100
@@ -200,7 +200,7 @@ void Display(struct Product *products, int *row) {
 
 //Update a product in Daily file
 void appendpro(struct Product *products, char date[20]) {
-    FILE *file = fopen("IceCreambin.dat", "ab");  // Open the binary file for appending in binary mode
+    FILE *file = fopen("Database/IceCreambin.dat", "ab");  // Open the binary file for appending in binary mode
 
     if (!file) {
         printf("Error opening file for appending\n");
@@ -457,7 +457,7 @@ void updateCSV(struct Product *products, int row) {
 }
 
 void updateBinary(struct Product *products, int row) {
-    FILE *binaryFile = fopen("IceCreambin.dat", "wb");
+    FILE *binaryFile = fopen("Database/IceCreambin.dat", "wb");
 
     if (binaryFile == NULL) {
         printf("Error opening binary file for writing.\n");
@@ -586,8 +586,8 @@ int main() {
     char date[20];
     struct Product products[MAX_PRODUCTS];
     size_t recordsize = sizeof(struct Product);
-    row = findNumberOfRecords("IceCreambin.dat",recordsize);
-    readFromBinaryFile(products,&row,"IceCreambin.dat");
+    row = findNumberOfRecords("Database/IceCreambin.dat",recordsize);
+    readFromBinaryFile(products,&row,"Database/IceCreambin.dat");
     system("clear|| cls");
     DisplayNearExpiration(products,&row);
     displayMenu();
@@ -599,7 +599,7 @@ int main() {
     else if(select == 1) {
         //system("clear|| cls");
         Display(products,&row);
-        main();
+        //main();
     }
     else if(select == 3) {
         system("clear || cls");
