@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <stdint.h>
+#include <sys/stat.h>
 
 //Define the Worst case scenario number
 #define MAX_LINE_LENGTH 100
@@ -139,8 +140,6 @@ int isValidDate(const char *date) {
 
 //<------------------Display products in our file-------------------------->
 
-#include <sys/stat.h>
-
 void openFile(const char *filename) {
     char command[200];
     sprintf(command, "open \"%s\"", filename);
@@ -189,17 +188,21 @@ void generateCSV(struct Product *summary, int count) {
     struct tm *timestamp;
     char filename[200];
     char directory[200];
+    char name[200];
 
     time(&now);
     timestamp = localtime(&now);
     
-    sprintf(directory, "../Flie/%04d-%02d-%02d/Amount_Left_in_stock", timestamp->tm_year + 1900, timestamp->tm_mon + 1, timestamp->tm_mday);
-    mkdir(directory, 0777); // สร้างโฟลเดอร์เพื่อเก็บไฟล์ CSV ในกรณีที่ยังไม่ได้ถูกสร้าง
+    sprintf(directory, "../File/%04d-%02d-%02d", timestamp->tm_year + 1900, timestamp->tm_mon + 1, timestamp->tm_mday);
+    mkdir(directory, 0777); 
 
-    printf("%s\n", directory); // แสดงที่อยู่ของไดเรกทอรี
+    sprintf(name, "%s/Amount_Left_in_stock", directory);
+    mkdir(name, 0777); 
+
+    printf("%s\n", directory); 
 
     sprintf(filename, "%s/Amount_Left_in_stock_%02d-%02d-%02d.csv",
-            directory, timestamp->tm_hour, timestamp->tm_min, timestamp->tm_sec);
+            name, timestamp->tm_hour, timestamp->tm_min, timestamp->tm_sec);
 
     file = fopen(filename, "w");
     if (file == NULL) {
@@ -222,20 +225,26 @@ void generateSalesCSV(struct Product *summary, int count) {
      FILE *file;
     time_t now;
     struct tm *timestamp;
-    char filename[200];
+   char filename[200];
     char directory[200];
+    char name[200];
 
     time(&now);
     timestamp = localtime(&now);
     
-    sprintf(directory, "../Flie/%04d-%02d-%02d/Summary_of_sales", timestamp->tm_year + 1900, timestamp->tm_mon + 1, timestamp->tm_mday);
-    mkdir(directory, 0777); // สร้างโฟลเดอร์เพื่อเก็บไฟล์ CSV ในกรณีที่ยังไม่ได้ถูกสร้าง
+    sprintf(directory, "../File/%04d-%02d-%02d", timestamp->tm_year + 1900, timestamp->tm_mon + 1, timestamp->tm_mday);
+    mkdir(directory, 0777); 
 
-    printf("%s\n", directory); // แสดงที่อยู่ของไดเรกทอรี
+    sprintf(name, "%s/Summary_of_sales", directory);
+    mkdir(name, 0777); 
 
-    sprintf(filename, "%s/Summary_of_sales_%02d:%02d:%02d.csv",
-            directory, timestamp->tm_hour, timestamp->tm_min, timestamp->tm_sec);
+    printf("%s\n", directory);
 
+    sprintf(filename, "%s/Summary_of_sales_%02d-%02d-%02d.csv",
+            name, timestamp->tm_hour, timestamp->tm_min, timestamp->tm_sec);
+
+
+    //Summary_of_sales_
 
     file = fopen(filename, "w");
     if (file == NULL) {
