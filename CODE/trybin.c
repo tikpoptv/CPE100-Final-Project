@@ -24,7 +24,7 @@ struct Product {
 
 void openFile(const char *filename) {
     char command[200];
-    sprintf(command, "open \"%s\"", filename);
+    sprintf(command, "open \"%s\" || start \"%s\", filename);
     system(command);
 }
 
