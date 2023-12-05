@@ -885,7 +885,6 @@ int main() {
     else if(select == 1) {
         //system("clear|| cls");
         Display(products,&row);
-        main();
     }
     else if(select == 3) {
         system("clear || cls");
