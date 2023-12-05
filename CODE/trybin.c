@@ -927,6 +927,7 @@ void DisplayNearExpiration(struct Product *products, int *row) {
         }
     }
 }
+
 //Displaying Out of stock
 void DisplayOutofStock(struct Product *products, int *row) {
     printf("Items Near Out of stock :\n");
@@ -1002,11 +1003,11 @@ void DisplayOutofStock(struct Product *products, int *row) {
             printf("Cookies & Cream is low on stock! Amount left : %.2lf\n",sum[i].quantity);
             count++;
         }  
-        else if(strcmp(sum[i].name,"Cone")==0 && sum[i].quantity <= 3) {
+        else if(strcmp(sum[i].name,"Cone")==0 && sum[i].quantity <= 2) {
             printf("Cone is low on stock! Amount left : %.2lf\n",sum[i].quantity);
             count++;
         }  
-        else if(strcmp(sum[i].name,"Cup")==0 && sum[i].quantity <= 3) {
+        else if(strcmp(sum[i].name,"Cup")==0 && sum[i].quantity <= 2) {
             printf("Cup is low on stock! Amount left : %.2lf\n",sum[i].quantity);
             count++;
         } 
