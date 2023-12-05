@@ -265,6 +265,10 @@ void appendpro(struct Product *products) {
         strcpy(update.date,date);
         printf("Expired date : ");
         scanf("%s", update.expireD);
+        while (isValidDate(update.expireD) == 0) {
+            printf("Please Input the expire date Correctly?(Write in DD/MM/YYYY format) : ");
+            scanf("%s",update.expireD);
+        }
         printf("Time : ");
         scanf("%lf", &update.time);
         printf("Product ID : ");
