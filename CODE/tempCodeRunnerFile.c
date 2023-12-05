@@ -1,1 +1,0 @@
-/Amount_Left_in_stock

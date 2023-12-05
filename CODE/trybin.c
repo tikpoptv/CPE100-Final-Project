@@ -22,10 +22,52 @@ struct Product {
     int price;
 };
 
+void openFile(const char *filename) {
+    char command[200];
+    sprintf(command, "open \"%s\"", filename);
+    system(command);
+}
+
+void openFileFinder(const char *filename) {
+    char command[200];
+    sprintf(command, "open -R \"%s\"", filename);
+    system(command);
+}
+
+void displayMenuAndGetChoice(const char *filename) {
+    printf("\033[1;34mDo you want to openFile or openFileFinder this item?\033[0m\n");
+    printf("\033[1;33m1. openFile\033[0m\n");
+    printf("\033[1;33m2. openFileFinder\033[0m\n");
+    printf("\033[1;31m0. Main Menu\033[0m\n");
+
+    int action;
+    printf("Enter your choice: ");
+    scanf("%d", &action);
+
+    system("clear|| cls");
+    switch (action) {
+        case 1:
+            openFile(filename);
+            displayMenuAndGetChoice(filename);
+            break;
+        case 2:
+            openFileFinder(filename);
+            displayMenuAndGetChoice(filename);
+            break;
+        case 0:
+            main();
+            break; 
+        default:
+            printf("\033[1;31mInvalid choice.\033[0m\n");
+            displayMenuAndGetChoice(filename);
+            break;
+    }
+}
+
 //<-------------------Display funtions------------------------->
 //display when start of the process
 void displayMenu() {
-    printf("<== Select features: ==>\n");
+    printf("\x1b[94m\n<== Select features: ==>\n\x1b[0m");
     printf("1. Display Products\n");
     printf("2. Update product\n");
     printf("3. Edit the transaction\n");
@@ -35,7 +77,7 @@ void displayMenu() {
 
 //Display choices for summary
 void displaySummary() {
-    printf("<== Select features: ==>\n");
+    printf("\x1b[94m<== Select features: ==>\n\x1b[0m");
     printf("1. Amount Left in stock\n");
     printf("2. Summary of sales right now\n");
     printf("0. Close Program\n");
@@ -43,7 +85,7 @@ void displaySummary() {
 
 //Display choices of Ice Cream Menu
 void displayIceCreamMenu() {
-    printf("<== Select features: ==>\n");
+    printf("\x1b[94m<== Select features: ==>\n\x1b[0m");
     printf("1. Cone Chocolate\n");
     printf("2. Cone Matcha\n");
     printf("3. Cone Strawberry\n");
@@ -86,6 +128,50 @@ void readFromBinaryFile(struct Product *products, int *count, const char *filena
     fclose(file);
 }
 //Displaying all transactions in the file
+void generateCSVAll(struct Product *products, int *row) {
+    FILE *file;
+    time_t now;
+    struct tm *timestamp;
+    char filename[200];
+    char directory[200];
+    char name[200];
+
+    time(&now);
+    timestamp = localtime(&now);
+    
+    sprintf(directory, "../File/%04d-%02d-%02d", timestamp->tm_year + 1900, timestamp->tm_mon + 1, timestamp->tm_mday);
+    mkdir(directory, 0777); 
+
+    sprintf(name, "%s/All_Products", directory);
+    mkdir(name, 0777); 
+
+   // printf("%s\n", directory);
+
+    sprintf(filename, "%s/All_Products_%04d_%02d_%02d:%02d-%02d-%02d.csv",
+            name, 
+            timestamp->tm_year + 1900, timestamp->tm_mon + 1, timestamp->tm_mday,
+            timestamp->tm_hour, timestamp->tm_min, timestamp->tm_sec);
+
+    file = fopen(filename, "w");
+    if (file == NULL) {
+    perror("Error opening file");
+    return;
+    }else{
+        printf("\x1b[93m\nThe csv file has been created!! \n\n\x1b[0m");
+    }
+
+    fprintf(file, "No., In/Out, Date, Expired Date, Time, Product ID, Name, Amount, Price\n");
+    for (int i = 0; i < *row; i++) {
+        fprintf(file, "%-4d, %-6s, %-10s, %-12s, %.2lf, %-11s, %-12s, %-6.2lf, %d\n", 
+            i + 1, products[i].inout, products[i].date, products[i].expireD, 
+            products[i].time, products[i].productID, products[i].name, 
+            products[i].quantity, products[i].price);
+    }
+
+    fclose(file);
+    displayMenuAndGetChoice(filename);
+}
+
 void displayAll(struct Product *products, int *row) {
     printf("Displaying all products:\n");
     printf("No. In/Out Date       Expired Date Time Product ID Name         Amount Price\n");
@@ -96,6 +182,8 @@ void displayAll(struct Product *products, int *row) {
             products[i].time, products[i].productID, products[i].name, 
             products[i].quantity, products[i].price);
     }
+    generateCSVAll(products, row);
+
 }
 //Check the year is a leap year or not
 int isLeapYear(int year) {
@@ -140,47 +228,6 @@ int isValidDate(const char *date) {
 
 //<------------------Display products in our file-------------------------->
 
-void openFile(const char *filename) {
-    char command[200];
-    sprintf(command, "open \"%s\"", filename);
-    system(command);
-}
-
-void openFileFinder(const char *filename) {
-    char command[200];
-    sprintf(command, "open -R \"%s\"", filename);
-    system(command);
-}
-
-void displayMenuAndGetChoice(const char *filename) {
-    printf("\033[1;34mDo you want to openFile or openFileFinder this item?\033[0m\n");
-    printf("\033[1;33m1. openFile\033[0m\n");
-    printf("\033[1;33m2. openFileFinder\033[0m\n");
-    printf("\033[1;31m3. Main Menu\033[0m\n");
-
-    int action;
-    printf("Enter your choice: ");
-    scanf("%d", &action);
-
-    switch (action) {
-        case 1:
-            openFile(filename);
-            displayMenuAndGetChoice(filename);
-            break;
-        case 2:
-            openFileFinder(filename);
-            displayMenuAndGetChoice(filename);
-            break;
-        case 3:
-            main();
-            break; 
-        default:
-            printf("\033[1;31mInvalid choice.\033[0m\n");
-            displayMenuAndGetChoice(filename);
-            break;
-    }
-}
-
 void generateCSV(struct Product *summary, int count) {
     char command[100];
     FILE *file;
@@ -199,15 +246,19 @@ void generateCSV(struct Product *summary, int count) {
     sprintf(name, "%s/Amount_Left_in_stock", directory);
     mkdir(name, 0777); 
 
-    printf("%s\n", directory); 
+  //  printf("%s\n", directory); 
 
-    sprintf(filename, "%s/Amount_Left_in_stock_%02d-%02d-%02d.csv",
-            name, timestamp->tm_hour, timestamp->tm_min, timestamp->tm_sec);
+    sprintf(filename, "%s/Amount_Left_in_stock_%04d_%02d_%02d:%02d-%02d-%02d.csv",
+            name, 
+            timestamp->tm_year + 1900, timestamp->tm_mon + 1, timestamp->tm_mday,
+            timestamp->tm_hour, timestamp->tm_min, timestamp->tm_sec);
 
     file = fopen(filename, "w");
     if (file == NULL) {
         printf("Error opening file.\n");
         return;
+    }else{
+        printf("\x1b[93m\nThe csv file has been created!! \n\n\x1b[0m");
     }
 
     fprintf(file, "Product ID, Name, Amount, Price\n");
@@ -222,10 +273,10 @@ void generateCSV(struct Product *summary, int count) {
 
 
 void generateSalesCSV(struct Product *summary, int count) {
-     FILE *file;
+    FILE *file;
     time_t now;
     struct tm *timestamp;
-   char filename[200];
+    char filename[200];
     char directory[200];
     char name[200];
 
@@ -238,10 +289,12 @@ void generateSalesCSV(struct Product *summary, int count) {
     sprintf(name, "%s/Summary_of_sales", directory);
     mkdir(name, 0777); 
 
-    printf("%s\n", directory);
+   // printf("%s\n", directory);
 
-    sprintf(filename, "%s/Summary_of_sales_%02d-%02d-%02d.csv",
-            name, timestamp->tm_hour, timestamp->tm_min, timestamp->tm_sec);
+    sprintf(filename, "%s/Summary_of_sales_%04d_%02d_%02d:%02d-%02d-%02d.csv",
+            name, 
+            timestamp->tm_year + 1900, timestamp->tm_mon + 1, timestamp->tm_mday,
+            timestamp->tm_hour, timestamp->tm_min, timestamp->tm_sec);
 
 
     //Summary_of_sales_
@@ -250,6 +303,8 @@ void generateSalesCSV(struct Product *summary, int count) {
     if (file == NULL) {
         printf("Error opening file.\n");
         return;
+    }else{
+        printf("\x1b[93m\nThe csv file has been created!! \n\n\x1b[0m");
     }
 
     int moneynow = 0;
@@ -260,7 +315,6 @@ void generateSalesCSV(struct Product *summary, int count) {
     }
 
     fprintf(file, "\nNow, the income is %d baht\n", moneynow); // เขียนผลลัพธ์รายได้ลงในไฟล์
-    printf("Now, the income is %d baht\n", moneynow); // แสดงผลลัพธ์รายได้ทั้งหมดในโปรแกรม
 
     fclose(file);
     displayMenuAndGetChoice(filename);
@@ -325,6 +379,7 @@ void Display(struct Product *products, int *row) {
     scanf("%d",&want);
     //Show the amount left in stock
     if(want == 1) {
+        system("clear || cls");
         for(int i=0;i<cnt;i++) {
             for(int j=0;j<*row;j++) {
                 if(strcmp(sum[i].productID,products[j].productID) == 0) {
@@ -347,6 +402,7 @@ void Display(struct Product *products, int *row) {
     }
     //Show the summary of sales
     else if(want == 2) {
+        system("clear || cls");
         int moneynow = 0;
         for(int i=0;i<cnt;i++) {
             for(int j=0;j<*row;j++) {
@@ -808,7 +864,7 @@ void writeAdminDataToBinaryFile(struct AdminData *adminData) {
 }
 
 void readAdminDataFromBinaryFile(struct AdminData *adminData) {
-    FILE *file = fopen("AdminDB.dat", "rb");
+    FILE *file = fopen("../Database/AdminDB.dat", "rb");
     if (!file) {
         printf("Error opening file for reading\n");
         return;
@@ -836,7 +892,7 @@ void addAdmin() {
     // Copy the hashed password to the admin data
     memcpy(admin.password, hashedPassword, SHA256_DIGEST_LENGTH);
 
-    FILE *file = fopen("AdminDB.dat", "ab");
+    FILE *file = fopen("../Database/AdminDB.dat", "ab");
     if (!file) {
         printf("Error opening file for writing\n");
         return;
@@ -880,7 +936,7 @@ int adminLogin() {
     printf("Enter password: ");
     scanf("%s", password);
 
-    FILE *file = fopen("AdminDB.dat", "rb");
+    FILE *file = fopen("../Database/AdminDB.dat", "rb");
     if (!file) {
         printf("Error opening file for reading\n");
         return 0;
@@ -1027,8 +1083,9 @@ void editTransaction(struct Product *products, int row) {
 //--------------------------------------------- End Of TIKPOPTV ---------------------------------------------//
 //Check the near expiration items in the stock
 void DisplayNearExpiration(struct Product *products, int *row) {
-    printf("Items Near Expiration (within 30 days):\n");
-    printf("Product ID\tName\t       Expired Date\n");
+    printf("\x1b[33mItems Near Expiration (within 30 days):\x1b[0m\n");
+    printf("\x1b[33mProduct ID\tName\t       Expired Date\x1b[0m\n");
+
 
     // Get the current time
     time_t currentTime;
@@ -1053,7 +1110,7 @@ void DisplayNearExpiration(struct Product *products, int *row) {
 
             // Check if the item is within 30 days of expiration
             if (differenceInDays < 30) {
-                printf("%-12s\t%-12s\t%s\n", products[i].productID, products[i].name, products[i].expireD);
+                printf("\x1b[91m%-12s\t%-12s\t%s\x1b[0m\n", products[i].productID, products[i].name, products[i].expireD);
             }
         }
     }
@@ -1061,7 +1118,7 @@ void DisplayNearExpiration(struct Product *products, int *row) {
 
 //Displaying Out of stock
 void DisplayOutofStock(struct Product *products, int *row) {
-    printf("Items Near Out of stock :\n");
+    printf("\x1b[33mItems Near Out of stock :\x1b[0m\n");
     char *strings[MAX_Product_ID];
     char *name[MAX_Product_ID];
     int cnt = 0;
@@ -1119,32 +1176,112 @@ void DisplayOutofStock(struct Product *products, int *row) {
     int count=0;
     for(int i=0;i<*row;i++) {
         if(strcmp(sum[i].name,"Chocolate")==0 && sum[i].quantity <= 3) {
-            printf("Chocolate is low on stock Amount left : %.2lf\n",sum[i].quantity);
-            count++;
+        printf("\x1b[1;31mChocolate is low on stock! Amount left : %.2lf\x1b[0m\n",sum[i].quantity);
+        count++;
         }  
         else if(strcmp(sum[i].name,"Matcha")==0 && sum[i].quantity <= 3) {
-            printf("Matcha is low on stock Amount left : %.2lf\n",sum[i].quantity);
+            printf("\x1b[1;31mMatcha is low on stock! Amount left : %.2lf\x1b[0m\n",sum[i].quantity);
             count++;
         }  
         else if(strcmp(sum[i].name,"Strawberry")==0 && sum[i].quantity <= 3) {
-            printf("Strawberry is low on stock! Amount left : %.2lf\n",sum[i].quantity);
+            printf("\x1b[1;31mStrawberry is low on stock! Amount left : %.2lf\x1b[0m\n",sum[i].quantity);
             count++;
         }  
         else if(strcmp(sum[i].name,"Cookies & Cream")==0 && sum[i].quantity <= 3) {
-            printf("Cookies & Cream is low on stock! Amount left : %.2lf\n",sum[i].quantity);
+            printf("\x1b[1;31mCookies & Cream is low on stock! Amount left : %.2lf\x1b[0m\n",sum[i].quantity);
             count++;
         }  
         else if(strcmp(sum[i].name,"Cone")==0 && sum[i].quantity <= 2) {
-            printf("Cone is low on stock! Amount left : %.2lf\n",sum[i].quantity);
+            printf("\x1b[1;31mCone is low on stock! Amount left : %.2lf\x1b[0m\n",sum[i].quantity);
             count++;
         }  
         else if(strcmp(sum[i].name,"Cup")==0 && sum[i].quantity <= 2) {
-            printf("Cup is low on stock! Amount left : %.2lf\n",sum[i].quantity);
+            printf("\x1b[1;31mCup is low on stock! Amount left : %.2lf\x1b[0m\n",sum[i].quantity);
             count++;
         } 
+
     }
     if(count == 0) printf("None\n");
 }
+void DisplayRemainingStock(struct Product *products, int *row) {
+printf("\x1b[95m+----------------------------------------+\x1b[0m\n");
+printf("\x1b[94m|    Remaining Stock for All Products    |\x1b[0m\n");
+printf("\x1b[95m|                     |                  |\x1b[0m\n");
+printf("\x1b[95m|     Product Name    | Remaining Stock  |\x1b[0m\n");
+printf("\x1b[95m+----------------------------------------+\x1b[0m\n");
+
+
+    // Arrays to store unique product IDs and names
+    char *uniqueIDs[MAX_Product_ID];
+    char *uniqueNames[MAX_Product_ID];
+    int uniqueCount = 0;
+
+    // Memory allocation for arrays
+    for (int i = 0; i < MAX_Product_ID; i++) {
+        uniqueIDs[i] = malloc(MAX_LINE_LENGTH);
+        uniqueNames[i] = malloc(MAX_LINE_LENGTH);
+        if (uniqueIDs[i] == NULL || uniqueNames[i] == NULL) {
+            // Handle memory allocation failure
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    // Find unique product IDs and names
+    for (int i = 0; i < *row; i++) {
+        int isDuplicate = 0;
+        for (int j = 0; j < uniqueCount; j++) {
+            if (strcmp(uniqueIDs[j], products[i].productID) == 0) {
+                isDuplicate = 1;
+                break;
+            }
+        }
+        if (!isDuplicate) {
+            strcpy(uniqueIDs[uniqueCount], products[i].productID);
+            strcpy(uniqueNames[uniqueCount], products[i].name);
+            uniqueCount++;
+        }
+    }
+
+    // Struct array to hold aggregated product data
+    struct Product aggregatedProducts[MAX_Product_ID];
+    for (int i = 0; i < uniqueCount; i++) {
+        aggregatedProducts[i].price = 0;
+        aggregatedProducts[i].quantity = 0.0;
+    }
+
+    // Aggregate price and quantity for each unique product
+    for (int i = 0; i < uniqueCount; i++) {
+        strcpy(aggregatedProducts[i].productID, uniqueIDs[i]);
+        strcpy(aggregatedProducts[i].name, uniqueNames[i]);
+    }
+
+    for (int i = 0; i < uniqueCount; i++) {
+        for (int j = 0; j < *row; j++) {
+            if (strcmp(aggregatedProducts[i].productID, products[j].productID) == 0) {
+                if (strcmp(products[j].inout, "In") == 0) {
+                    aggregatedProducts[i].price += products[j].price;
+                    aggregatedProducts[i].quantity += products[j].quantity;
+                } else if (strcmp(products[j].inout, "Out") == 0) {
+                    aggregatedProducts[i].price -= products[j].price;
+                    aggregatedProducts[i].quantity -= products[j].quantity;
+                }
+            }
+        }
+    }
+
+    for (int i = 0; i < uniqueCount; i++) {
+    printf("\x1b[95m|\x1b[0m \x1b[93m%-19s\x1b[0m \x1b[95m|\x1b[0m \x1b[92m%-16.2lf\x1b[0m \x1b[95m|\x1b[0m\n", aggregatedProducts[i].name, aggregatedProducts[i].quantity);
+
+    }
+
+    printf("\x1b[95m+---------------------+------------------+\x1b[0m\n");
+
+    if (uniqueCount == 0) {
+        printf("No products available.\n");
+    }
+}
+
+
 
 int main() {
     int row=0,select;
@@ -1155,16 +1292,19 @@ int main() {
     readFromBinaryFile(products,&row,"../Database/IceCreambin.dat");
     system("clear|| cls");
     DisplayNearExpiration(products,&row);
+    DisplayRemainingStock(products,&row);
     DisplayOutofStock(products,&row);
     displayMenu();
+    printf("Select features: ");
     scanf("%d",&select);
 
     if(select == 2) {
+        system("clear || cls");
         appendpro(products);
         main();
     }
     else if(select == 1) {
-        //system("clear|| cls");
+        system("clear|| cls");
         Display(products,&row);
     }
     else if(select == 3) {
@@ -1179,11 +1319,12 @@ int main() {
         printf("Closed the Program\n");
     }
     else if(select == 4) {
+        system("clear || cls");
         printf("Selected option 4. Displaying all products...\n");
         displayAll(products, &row);
     }
     else if(select == 5) {
-        adminLogin();
+      //  displayRemainingStock(products, &row);
     }
     return 0;
 }
