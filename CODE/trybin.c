@@ -1086,7 +1086,6 @@ void DisplayNearExpiration(struct Product *products, int *row) {
     printf("\x1b[33mItems Near Expiration (within 30 days):\x1b[0m\n");
     printf("\x1b[33mProduct ID\tName\t       Expired Date\x1b[0m\n");
 
-
     // Get the current time
     time_t currentTime;
     time(&currentTime);
@@ -1097,10 +1096,20 @@ void DisplayNearExpiration(struct Product *products, int *row) {
     for (int i = 0; i < *row; i++) {
         if (strcmp(products[i].expireD, "null") != 0) {
             // Convert the string expiration date to a tm struct
-            strptime(products[i].expireD, "%d/%m/%Y", &expirationDate);
+            memset(&expirationDate, 0, sizeof(struct tm)); // Initialize the struct
+            if (strptime(products[i].expireD, "%d/%m/%Y", &expirationDate) == NULL) {
+                fprintf(stderr, "Error: Invalid date format\n");
+                continue;
+            }
 
             // Convert tm struct to time_t
             time_t expirationTime = mktime(&expirationDate);
+
+            // Check if mktime failed
+            if (expirationTime == (time_t)(-1)) {
+                fprintf(stderr, "Error: Invalid date/time\n");
+                continue;
+            }
 
             // Calculate the difference in seconds
             double difference = difftime(expirationTime, currentTime);
@@ -1109,12 +1118,13 @@ void DisplayNearExpiration(struct Product *products, int *row) {
             double differenceInDays = difference / (60 * 60 * 24);
 
             // Check if the item is within 30 days of expiration
-            if (differenceInDays < 30) {
+            if (differenceInDays <= 30 && differenceInDays >= 0) {
                 printf("\x1b[91m%-12s\t%-12s\t%s\x1b[0m\n", products[i].productID, products[i].name, products[i].expireD);
             }
         }
     }
 }
+
 
 //Displaying Out of stock
 void DisplayOutofStock(struct Product *products, int *row) {
@@ -1199,9 +1209,9 @@ void DisplayOutofStock(struct Product *products, int *row) {
             printf("\x1b[1;31mCup is low on stock! Amount left : %.2lf\x1b[0m\n",sum[i].quantity);
             count++;
         } 
-
     }
     if(count == 0) printf("None\n");
+    printf("\n");
 }
 void DisplayRemainingStock(struct Product *products, int *row) {
 printf("\x1b[95m+----------------------------------------+\x1b[0m\n");
@@ -1288,12 +1298,20 @@ int main() {
     struct Product products[MAX_PRODUCTS];
     size_t recordsize = sizeof(struct Product);
     row = findNumberOfRecords("../Database/IceCreambin.dat",recordsize);
-    
     readFromBinaryFile(products,&row,"../Database/IceCreambin.dat");
     system("clear|| cls");
-    DisplayNearExpiration(products,&row);
+    printf("\033[1;34m"); // ใช้สีน้ำเงินเข้ม
+    printf("+----------------------------------------+\n");
+    printf("|             ");
+    printf("\033[1;36m"); // ใช้สีฟ้าเข้ม
+    printf("ICE CREAM SHOP");
+    printf("\033[1;34m"); // ใช้สีน้ำเงินเข้ม
+    printf("             |\n");
+    printf("+----------------------------------------+\n");
+    printf("\033[0m"); // รีเซ็ตสีกลับมาเป็นค่าเริ่มต้น
     DisplayRemainingStock(products,&row);
     DisplayOutofStock(products,&row);
+    DisplayNearExpiration(products,&row);
     displayMenu();
     printf("Select features: ");
     scanf("%d",&select);

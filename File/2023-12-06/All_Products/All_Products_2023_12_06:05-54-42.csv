@@ -1,0 +1,14 @@
+No., In/Out, Date, Expired Date, Time, Product ID, Name, Amount, Price
+1   , In    , 26/11/2023, 02/12/2023  , 12.01, ICE111     , Chocolate   , 18.00 , 14400
+2   , In    , 26/11/2023, 02/05/2024  , 12.01, ICE141     , Matcha      , 18.00 , 14400
+3   , In    , 26/11/2023, 02/05/2024  , 12.01, ICE131     , Strawberry  , 18.00 , 14400
+4   , In    , 26/11/2023, 02/05/2024  , 12.01, ICE121     , Cookies & Cream, 18.00 , 14400
+5   , In    , 26/11/2023, 02/05/2024  , 12.01, ICE211     , Cone        , 24.00 , 4800
+6   , In    , 26/11/2023, 02/05/2024  , 12.01, ICE221     , Cup         , 24.00 , 2400
+7   , Out   , 27/11/2023, null        , 10.01, ICE111     , Chocolate   , 0.02  , 50
+8   , Out   , 27/11/2023, null        , 10.01, ICE211     , Cone        , 0.02  , 9
+9   , Out   , 27/11/2023, null        , 10.01, ICE131     , Strawberry  , 0.02  , 50
+10  , Out   ,          , null        , 11.01, ICE111     , Chocolate   , 0.02  , 50
+11  , Out   ,          , null        , 11.01, ICE211     , Cone        , 0.02  , 9
+12  , Out   ,          , null        , 11.02, ICE111     , Chocolate   , 20.00 , 5
+13  , In    , 29/12/2023, 30/12/2023  , 5.52, ICE112     , Chocolate   , 20.00 , 14400
