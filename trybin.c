@@ -456,6 +456,25 @@ void updateCSV(struct Product *products, int row) {
     fclose(file);
 }
 
+void updateBinary(struct Product *products, int row) {
+    FILE *binaryFile = fopen("IceCreambin.dat", "wb");
+
+    if (binaryFile == NULL) {
+        printf("Error opening binary file for writing.\n");
+        return;
+    }
+
+    // Write the header or any necessary information for the binary file (if needed)
+    // For instance:
+    // fwrite(&someHeaderInfo, sizeof(SomeHeaderType), 1, binaryFile);
+
+    // Write each product to the binary file
+    fwrite(products, sizeof(struct Product), row, binaryFile);
+
+    fclose(binaryFile);
+}
+
+
 void editTransaction(struct Product *products, int row) {
     int selection;
 
@@ -499,7 +518,7 @@ void editTransaction(struct Product *products, int row) {
             scanf(" %c", &confirm);
 
             if (confirm == 'Y' || confirm == 'y') {
-                updateCSV(products, row);
+                updateBinary(products, row);
             } else {
                 printf("Changes discarded.\n");
             }
@@ -516,7 +535,7 @@ void editTransaction(struct Product *products, int row) {
             scanf(" %c", &confirmDelete);
 
             if (confirmDelete == 'Y' || confirmDelete == 'y') {
-                updateCSV(products, row);
+                updateBinary(products, row);
             } else {
                 printf("Deletion discarded.\n");
             }
