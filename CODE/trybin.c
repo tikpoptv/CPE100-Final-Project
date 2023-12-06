@@ -977,81 +977,7 @@ void updateBinary(struct Product *products, int row) {
 }
 
 
-void editTransaction(struct Product *products, int row) {
-    if (adminLogin()) { 
-        int selection;
-
-        printf("Products List:\n");
-        printf("No.  In/Out  Date       Expired Date  Time  Product ID  Name         Amount  Price\n");
-        for (int i = 0; i < row; i++) {
-            printf("%-5d %-7s %-10s %-12s %.2lf %-11s %-12s %-7.2lf %d\n", i + 1, products[i].inout, products[i].date, products[i].expireD, products[i].time, products[i].productID, products[i].name, products[i].quantity, products[i].price);
-        }
-
-        printf("Select the item number to edit or delete: ");
-        scanf("%d", &selection);
-        selection--; 
-
-        if (selection < 0 || selection >= row) {
-            printf("Invalid selection.\n");
-            return;
-        }
-
-        printf("\033[1;34mDo you want to edit or delete this item?\033[0m\n");
-        printf("\033[1;33m1. EDIT\033[0m\n");
-        printf("\033[1;31m2. DELETE\033[0m\n");
-
-        int action;
-        printf("Enter your choice: ");
-        scanf("%d", &action);
-
-        switch (action) {
-            case 1:
-                // To edit an item
-                printf("Enter new quantity: ");
-                scanf("%lf", &products[selection].quantity);
-                printf("Enter new price: ");
-                scanf("%d", &products[selection].price);
-
-                printf("Updated transaction:\n");
-                printf("In/Out  Date       Expired Date  Time  Product ID  Name         Amount  Price\n");
-                printf("%-7s %-10s %-12s %.2lf %-11s %-12s %-7.2lf %d\n", products[selection].inout, products[selection].date, products[selection].expireD, products[selection].time, products[selection].productID, products[selection].name, products[selection].quantity, products[selection].price);
-
-                char confirm;
-                printf("Confirm changes? (Y/N): ");
-                scanf(" %c", &confirm);
-
-                if (confirm == 'Y' || confirm == 'y') {
-                    updateBinary(products, row);
-                } else {
-                    printf("Changes discarded.\n");
-                }
-                break;
-            case 2:
-                // To delete an item
-                for (int i = selection; i < row - 1; ++i) {
-                    products[i] = products[i + 1];
-                }
-                row--;
-
-                char confirmDelete;
-                printf("\033[1;31mConfirm deletion? (Y/N): \033[0m");
-                scanf(" %c", &confirmDelete);
-
-                if (confirmDelete == 'Y' || confirmDelete == 'y') {
-                    updateBinary(products, row);
-                } else {
-                    printf("Deletion discarded.\n");
-                }
-                break;
-            default:
-                printf("\033[1;31mInvalid choice.\033[0m\n");
-                break;
-        }
-    } else {
-        printf("Invalid username or password. Access denied!\n");
-    }
-}
-
+void editTransaction(struct Product *products, int row);
 //--------------------------------------------- End Of TIKPOPTV ---------------------------------------------//
 //Check the near expiration items in the stock
 void DisplayNearExpiration(struct Product *products, int *row) {
@@ -1346,5 +1272,122 @@ void displayMenuAndGetChoice(const char *filename) {
             printf("\033[1;31mInvalid choice.\033[0m\n");
             displayMenuAndGetChoice(filename);
             break;
+    }
+}
+
+void editTransaction(struct Product *products, int row) {
+    if (adminLogin()) { 
+        int selection;
+
+        printf("Products List:\n");
+        printf("No.  In/Out  Date       Expired Date  Time  Product ID  Name         Amount  Price\n");
+        for (int i = 0; i < row; i++) {
+            printf("%-5d %-7s %-10s %-12s %.2lf %-11s %-12s %-7.2lf %d\n", i + 1, products[i].inout, products[i].date, products[i].expireD, products[i].time, products[i].productID, products[i].name, products[i].quantity, products[i].price);
+        }
+
+        printf("Select the item number to edit or delete: ");
+        scanf("%d", &selection);
+        selection--; 
+
+        if (selection < 0 || selection >= row) {
+            printf("Invalid selection.\n");
+            return;
+        }
+
+        printf("\033[1;34mDo you want to edit or delete this item?\033[0m\n");
+        printf("\033[1;33m1. EDIT Date\033[0m\n");
+        printf("\033[1;33m2. EDIT ExpireD\033[0m\n");
+        printf("\033[1;33m3. EDIT Quantity\033[0m\n");
+        printf("\033[1;31m4. DELETE\033[0m\n");
+        printf("\033[1;31m0. Main Menu\033[0m\n");
+        int action;
+        printf("Enter your choice: ");
+        scanf("%d", &action);
+
+        switch (action) {
+            case 0:
+                main();
+                break;
+            case 1:
+                printf("Enter new date (YYYY-MM-DD): ");
+                scanf("%s", products[selection].date); // Assuming date is stored as a string in the format YYYY-MM-DD
+                
+                printf("Updated transaction:\n");
+                printf("In/Out  Date       Expired Date  Time  Product ID  Name         Amount  Price\n");
+                printf("%-7s %-10s %-12s %.2lf %-11s %-12s %-7.2lf %d\n", products[selection].inout, products[selection].date, products[selection].expireD, products[selection].time, products[selection].productID, products[selection].name, products[selection].quantity, products[selection].price);
+
+                char confirmEdit;
+                printf("Confirm changes? (Y/N): ");
+                scanf(" %c", &confirmEdit);
+
+                if (confirmEdit == 'Y' || confirmEdit == 'y') {
+                    updateBinary(products, row);
+                } else {
+                    printf("Changes discarded.\n");
+                }
+                break;
+            case 2:
+                printf("Enter new expiration date (YYYY-MM-DD): ");
+                scanf("%s", products[selection].expireD); // Assuming expiration date is stored as a string in the format YYYY-MM-DD
+                
+                printf("Updated transaction:\n");
+                printf("In/Out  Date       Expired Date  Time  Product ID  Name         Amount  Price\n");
+                printf("%-7s %-10s %-12s %.2lf %-11s %-12s %-7.2lf %d\n", products[selection].inout, products[selection].date, products[selection].expireD, products[selection].time, products[selection].productID, products[selection].name, products[selection].quantity, products[selection].price);
+
+                char confirmExpire;
+                printf("Confirm changes? (Y/N): ");
+                scanf(" %c", &confirmExpire);
+
+                if (confirmExpire == 'Y' || confirmExpire == 'y') {
+                    updateBinary(products, row);
+                } else {
+                    printf("Changes discarded.\n");
+                }
+                break;
+            case 3:
+                // To edit an item
+                printf("Enter new quantity: ");
+                scanf("%lf", &products[selection].quantity);
+                printf("Enter new price: ");
+                scanf("%d", &products[selection].price);
+
+                printf("Updated transaction:\n");
+                printf("In/Out  Date       Expired Date  Time  Product ID  Name         Amount  Price\n");
+                printf("%-7s %-10s %-12s %.2lf %-11s %-12s %-7.2lf %d\n", products[selection].inout, products[selection].date, products[selection].expireD, products[selection].time, products[selection].productID, products[selection].name, products[selection].quantity, products[selection].price);
+
+                char confirm;
+                printf("Confirm changes? (Y/N): ");
+                scanf(" %c", &confirm);
+
+                if (confirm == 'Y' || confirm == 'y') {
+                    updateBinary(products, row);
+                } else {
+                    printf("Changes discarded.\n");
+                }
+                break;
+            case 4:
+                // To delete an item
+                for (int i = selection; i < row - 1; ++i) {
+                    products[i] = products[i + 1];
+                }
+                row--;
+
+                char confirmDelete;
+                printf("\033[1;31mConfirm deletion? (Y/N): \033[0m");
+                scanf(" %c", &confirmDelete);
+
+                if (confirmDelete == 'Y' || confirmDelete == 'y') {
+                    updateBinary(products, row);
+                } else {
+                    printf("Deletion discarded.\n");
+                }
+                break;
+            
+            default:
+                printf("\033[1;31mInvalid choice.\033[0m\n");
+                break;
+        }
+    } else {
+        printf("Invalid username or password. Access denied!\n");
     }
 }
